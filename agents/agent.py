@@ -12,8 +12,8 @@ class Agent:
         self.simulation_paused = False
 
         # simulation interface
-        self.api : agent_api.AgentAPI = None
-        self.world_info : dict = None
+        self.api : agent_api.AgentAPI = None  # type: ignore
+        self.world_info : dict = None  # type: ignore
 
         # agent status flag
         self.thinking = False            
