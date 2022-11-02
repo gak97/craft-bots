@@ -184,10 +184,10 @@ Resources:
   black_heavy:
     _description: If True, an actor carrying one Black resource cannot carry anything
       else.
-    value: false
+    value: true
   blue_extra_effort:
     _description: Blue will take longer to mine by this factor.
-    value: 1
+    value: 2
   cycle_length:
     _description: Length in simulation ticks of the day cycle, used in conjunction
       with Red collection intervals.
@@ -201,7 +201,7 @@ Resources:
     value: 100
   orange_actors_to_mine:
     _description: Number of additional actors required to mine Orange resource.
-    value: 0
+    value: 2
   red_collection_intervals:
     _description: Start and end of interval within which Red resource can be collected
       each day.
@@ -212,7 +212,7 @@ Run Configuration:
   lockstep:
     _description: If true, the simulation will block while the agent makes a decision.
       If false, the agent and simulation will run in separate threads.
-    value: false
+    value: true
   log_file_path:
     _description: Log file path.
     value: simple_log.txt

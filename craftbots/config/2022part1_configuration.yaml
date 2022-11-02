@@ -186,7 +186,7 @@ Resources:
 Run Configuration:
   lockstep:
     _description: If true, the simulation will block while the agent makes a decision. If false, the agent and simulation will run in separate threads.
-    value: false
+    value: true
   log_file_path:
     _description: Log file path.
     value: simple_log.txt

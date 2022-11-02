@@ -39,6 +39,7 @@ class Assignment_Agent(Agent):
     # Main function for writing plans etc.
     # does not execute anything, is purely for testing plan
     def get_next_commands(self):
+        return self.get_next_commands_v1()
         # You can use this to test your PDDL
         PDDLInterface.writeProblem(world_info=self.world_info)
 

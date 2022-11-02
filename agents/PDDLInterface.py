@@ -1,6 +1,7 @@
 from cgitb import handler
 from collections.abc import Set
 # import site
+import random
 from typing import List, Tuple, Union
 import requests
 import sys
@@ -36,43 +37,38 @@ class PDDLInterface:
             f.write(handler.tab)
 
             for actor in world_info['actors'].values():
-                f.write('actor' + handler.underscore + str(actor['id']) + handler.space)
+                f.write('a' + str(actor['id']) + handler.space)
             f.write(handler.dash + handler.space + 'actor' + handler.newline)
 
             f.write(handler.tab)
             for task in world_info['tasks'].values():
-                f.write('task' + handler.underscore + str(task['id']) + handler.space)
+                f.write('t' + str(task['id']) + handler.space)
             f.write(handler.dash + handler.space + 'task' + handler.newline)
 
-            f.write(handler.tab)
-            for resource in world_info['resources'].values():
-                f.write('resource' + handler.underscore + str(resource['id']) + handler.space)
-            f.write(handler.dash + handler.space + 'resource' + handler.newline)
-
-            f.write(handler.tab)
-            for resource in world_info['resources'].values():
-                f.write('colour' + handler.underscore + str(resource['colour']) + handler.space)
-            f.write(handler.dash + handler.space + 'color' + handler.newline)
+            # f.write(handler.tab)
+            # for resource in world_info['resources'].values():
+            #     f.write('r' + str(resource['id']) + handler.space)
+            # f.write(handler.dash + handler.space + 'resource' + handler.newline)
 
             f.write(handler.tab)
             for node in world_info['nodes'].values():
-                f.write('node' + handler.underscore + str(node['id']) + handler.space)
+                f.write('n' + str(node['id']) + handler.space)
             f.write(handler.dash + handler.space + 'location' + handler.newline)
 
-            f.write(handler.tab)
-            for site in world_info['sites'].values():
-                f.write('site' + handler.underscore + str(site['id']) + handler.space)
-            f.write(handler.dash + handler.space + 'site' + handler.newline)
+            # f.write(handler.tab)
+            # for site in world_info['sites'].values():
+            #     f.write('s' + str(site['id']) + handler.space)
+            # f.write(handler.dash + handler.space + 'site' + handler.newline)
 
             f.write(handler.tab)
             for mine in world_info['mines'].values():
-                f.write('mine' + handler.underscore + str(mine['id']) + handler.space)
+                f.write('m' + str(mine['id']) + handler.space)
             f.write(handler.dash + handler.space + 'mine' + handler.newline)
 
-            f.write(handler.tab)
-            for building in world_info['buildings'].values():
-                f.write('building' + handler.underscore + str(building['id']) + handler.space)
-            f.write(handler.dash + handler.space + 'building' + handler.newline)
+            # f.write(handler.tab)
+            # for building in world_info['buildings'].values():
+            #     f.write('b' + str(building['id']) + handler.space)
+            # f.write(handler.dash + handler.space + 'building' + handler.newline)
 
             f.write(handler.close_paren)
             f.write(handler.newline)
@@ -82,40 +78,74 @@ class PDDLInterface:
 
             f.write(":init" + handler.newline)
 
+            # set the initial node for each actor and negate the rest of the nodes
             for actor in world_info['actors'].values():
-                f.write(handler.tab + '(alocation actor' + handler.underscore + str(actor['id']) + handler.space + 'node' + 
-                        handler.underscore + str(actor['node']) + ')' + handler.newline)
+                f.write(handler.tab)
+                f.write('(alocation a' + str(actor['id']) + handler.space + 'n' + str(actor['node']) + ')' + handler.newline)
+                for node in world_info['nodes'].values():
+                    if node['id'] != actor['node']:
+                        f.write(handler.tab)
+                        f.write('(not (alocation a' + str(actor['id']) + handler.space + 'n' + str(node['id']) + '))' + handler.newline)
 
-            # for task in world_info['tasks'].values():
-            #     f.write(handler.tab + '(at task' + handler.underscore + str(task['id']) + 'node' +
-            #             handler.underscore + str(task['node']) + ')' + handler.newline)
-            #     f.write(handler.tab + '(has task' + handler.underscore + str(task['id']) + 'resource' +
-            #             handler.underscore + str(task['needed_resources']) + ')' + handler.newline)
-            #     f.write(handler.tab + '(completed task' + handler.underscore + str(task['id']) + 'false)' + handler.newline)
+            # set the connected nodes given the edges
+            for edge in world_info['edges'].values():
+                f.write(handler.tab)
+                f.write('(connected n' + str(edge['node_a']) + handler.space + 'n' + str(edge['node_b']) + ')')
+                f.write(handler.tab)
+                f.write('(connected n' + str(edge['node_b']) + handler.space + 'n' + str(edge['node_a']) + ')')
+                f.write(handler.newline)
 
-            for resource in world_info['resources'].values():
-                f.write(handler.tab + '(not (rlocation resource' + handler.underscore + str(resource['id']) + 'node' +
-                        handler.underscore + str(resource['location']) + ')' + handler.newline)
+            # negate the initial node for the resources
+            # for resource in world_info['resources'].values():
+            #     f.write(handler.tab)
+            #     for node in world_info['nodes'].values():
+            #         if node['id'] == resource['location']:
+            #             f.write(handler.tab)
+            #             f.write('(not (rlocation r' + str(resource['id']) + handler.space + 'n' + str(node['id']) + '))' + handler.newline)
 
+            # set the initial dig location for the mines
             for mine in world_info['mines'].values():
-                f.write(handler.tab + '(dlocation mine' + handler.underscore + str(mine['id']) + 'node' +
-                        handler.underscore + str(mine['node']) + ')' + handler.newline)
+                f.write(handler.tab)
+                f.write('(dlocation m' + str(mine['id']) + handler.space + 'n' + str(mine['node']) + ')' + handler.newline)
 
-            for site in world_info['sites'].values():
-                f.write(handler.tab + '(slocation site' + handler.underscore + str(site['id']) + 'node' +
-                        handler.underscore + str(site['node']) + ')' + handler.newline)
+            # set the initial site location for the buildings
+            # for site in world_info['sites'].values():
+            #     f.write(handler.tab)
+            #     f.write('(slocation s' + str(site['id']) + handler.space + 'n' + str(site['node']) + ')' + handler.newline)
 
-            
+            # set the variables mining and not_mining for the mines
+            # for mine in world_info['mines'].values():
+            #     for node in world_info['nodes'].values():
+            #         if node['id'] == mine['node']:
+            #             f.write(handler.tab)
+            #             f.write('(not (mining m' + str(mine['id']) + handler.space + 'n' + str(node['id']) + '))' + handler.newline)
+            #             f.write(handler.tab)
+            #             f.write('(not_mining m' + str(mine['id']) + handler.space + 'n' + str(node['id']) + ')' + handler.newline)
 
             f.write(handler.close_paren)
             f.write(handler.newline)
             f.write(handler.open_paren)
-            f.write(":goal" + handler.newline)
 
-            for task in world_info['tasks'].values():
-                f.write(handler.tab + '(completed task' + handler.underscore + str(task['id']) + 'true)' + handler.newline)
-                
-            f.write(handler.newline)
+        ######################################################## GOAL ########################################################
+
+            f.write(":goal" + handler.newline)
+            f.write(handler.tab + '(and' + handler.newline)
+
+            # set the goal node for each actor different from the initial node
+            for actor in world_info['actors'].values():
+                for node in world_info['nodes'].values():
+                    if node['id'] != actor['node']:
+                        f.write(handler.tab + handler.tab)
+                        f.write('(alocation a' + str(actor['id']) + handler.space + 'n' + str(node['id']) + ')' + handler.newline)
+                        break
+
+            # set the goal node for digging for each actor with different resource
+            # for actor in world_info['actors'].values():
+            #     for resource in world_info['resources'].values():
+            #         if resource['id'] != actor['resources']:
+            #             f.write(handler.tab + handler.tab)
+            #             f.write('(rlocation r' + str(resource['id']) + handler.space + 'n' + str(actor['node']) + ')' + handler.newline)
+            #             break
 
             f.write(")))" + handler.newline)
             f.close()
