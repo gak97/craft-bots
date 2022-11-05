@@ -140,6 +140,9 @@ class Assignment_Agent(Agent):
         elif action == 'drop':
             self.api.drop_resource(params[0], params[1])
 
+        elif action == 'create-site':
+            self.api.start_site(params[0], params[1])
+
         elif action == 'deposit':
             self.api.deposit_resources(params[0], params[2], params[1])
 

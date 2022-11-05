@@ -23,18 +23,28 @@
         (alocation ?a - actor ?l - location)
         (connected ?l1 - location ?l2 - location)
         (rlocation ?r - resource ?l - location)
+        
         (blocation ?b - building ?l - location)
         (not_blocation ?b - building ?l - location)
+        
+        (create_site ?a - actor ?l - location)
+        (not_created_site ?a - actor ?l - location)
+        
         (slocation ?s - site ?l - location)
         (dlocation ?m - mine ?l - location)
+        
         (carrying ?a - actor ?r - resource)
         (not_carrying ?a - actor ?r - resource)
-        ; (built ?b - building)
+        
         (mining ?a - actor ?r - resource)
         (not_mining ?a - actor ?r - resource)
+        
         (rcolor ?r - resource ?c - color)
         (deposited ?a - actor ?r - resource ?c - color ?l - location)
         (not_deposited ?a - actor ?r - resource ?c - color ?l - location)
+
+        (constructed ?a - actor ?r - resource ?c - color ?l - location)
+        (not_constructed ?a - actor ?r - resource ?c - color ?l - location)
     )
 
     ;; agent moves between two nodes of the graph provided that the nodes are connected
@@ -66,19 +76,26 @@
         :effect (and (rlocation ?r ?l) (not (carrying ?a ?r)) (not (rcolor ?r ?c)))
     )
 
+    ;; create a new site at the given node and add it to the list of sites
+    (:action create-site
+        :parameters (?a - actor ?l - location)
+        :precondition (and (alocation ?a ?l) (not_created_site ?a ?l))
+        :effect (and (create_site ?a ?l) (not (not_created_site ?a ?l)))
+    )
+
     ;; agent removes one resource from its inventory and adds it to a site at the current node. 
     ;; resources cannot be recovered once deposited into a site
     (:action deposit
-        :parameters (?a - actor ?r - resource ?s - site ?l - location ?c - color)
-        :precondition (and (alocation ?a ?l) (carrying ?a ?r) (slocation ?s ?l) (rcolor ?r ?c) (not_deposited ?a ?r ?c ?l))
+        :parameters (?a - actor ?r - resource ?l - location ?c - color)
+        :precondition (and (alocation ?a ?l) (carrying ?a ?r) (rcolor ?r ?c) (not_deposited ?a ?r ?c ?l))
         :effect (and (not (carrying ?a ?r)) (not (rcolor ?r ?c)) (deposited ?a ?r ?c ?l) (not (not_deposited ?a ?r ?c ?l)))
     )
 
     ;; progresses the completion of a site at the current node. The completion is bounded by the fraction of required resources 
     ;; that have been deposited. Once complete, the site will transform into a completed building
     (:action construct
-        :parameters (?a - actor ?s - site ?b - building ?l - location ?c - color, ?r - resource)
-        :precondition (and (alocation ?a ?l) (slocation ?s ?l) (not_blocation ?b ?l) (deposited ?a ?r ?c ?l))
-        :effect (and (not (slocation ?s ?l)) (blocation ?b ?l) (not (not_blocation ?b ?l)) (not (deposited ?a ?r ?c ?l)))
+        :parameters (?a - actor ?l - location ?c - color ?r - resource)
+        :precondition (and (alocation ?a ?l) (deposited ?a ?r ?c ?l) (not_constructed ?a ?r ?c ?l))
+        :effect (and (not (deposited ?a ?r ?c ?l)) (constructed ?a ?r ?c ?l) (not (not_constructed ?a ?r ?c ?l)))
     )
 )

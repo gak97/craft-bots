@@ -45,30 +45,27 @@ class PDDLInterface:
                 f.write('t' + str(task['id']) + handler.space)
             f.write(handler.dash + handler.space + 'task' + handler.newline)
 
-            # f.write(handler.tab)
-            # for resource in world_info['resources'].values():
-            #     f.write('r' + str(resource['id']) + handler.space)
-            # f.write(handler.dash + handler.space + 'resource' + handler.newline)
-
             f.write(handler.tab)
             for node in world_info['nodes'].values():
                 f.write('n' + str(node['id']) + handler.space)
             f.write(handler.dash + handler.space + 'location' + handler.newline)
-
-            # f.write(handler.tab)
-            # for site in world_info['sites'].values():
-            #     f.write('s' + str(site['id']) + handler.space)
-            # f.write(handler.dash + handler.space + 'site' + handler.newline)
 
             f.write(handler.tab)
             for mine in world_info['mines'].values():
                 f.write('m' + str(mine['id']) + handler.space)
             f.write(handler.dash + handler.space + 'mine' + handler.newline)
 
-            # f.write(handler.tab)
-            # for building in world_info['buildings'].values():
-            #     f.write('b' + str(building['id']) + handler.space)
-            # f.write(handler.dash + handler.space + 'building' + handler.newline)
+            f.write(handler.tab)
+            for task in world_info['tasks'].values():
+                for i in range(sum(task['needed_resources'])):
+                    f.write('r' + str(i) + handler.space)
+                break
+            f.write(handler.dash + handler.space + 'resource' + handler.newline)
+
+            f.write(handler.tab)
+            for i in range(len(PDDLInterface.COLOURS)):
+                f.write('c' + str(i) + handler.space)
+            f.write(handler.dash + handler.space + 'color' + handler.newline)
 
             f.write(handler.close_paren)
             f.write(handler.newline)
@@ -88,6 +85,7 @@ class PDDLInterface:
                         f.write('(not (alocation a' + str(actor['id']) + handler.space + 'n' + str(node['id']) + '))' + handler.newline)
 
             # set the connected nodes given the edges
+            f.write(handler.newline)
             for edge in world_info['edges'].values():
                 f.write(handler.tab)
                 f.write('(connected n' + str(edge['node_a']) + handler.space + 'n' + str(edge['node_b']) + ')')
@@ -95,32 +93,46 @@ class PDDLInterface:
                 f.write('(connected n' + str(edge['node_b']) + handler.space + 'n' + str(edge['node_a']) + ')')
                 f.write(handler.newline)
 
-            # negate the initial node for the resources
-            # for resource in world_info['resources'].values():
-            #     f.write(handler.tab)
-            #     for node in world_info['nodes'].values():
-            #         if node['id'] == resource['location']:
-            #             f.write(handler.tab)
-            #             f.write('(not (rlocation r' + str(resource['id']) + handler.space + 'n' + str(node['id']) + '))' + handler.newline)
-
             # set the initial dig location for the mines
+            f.write(handler.newline)
             for mine in world_info['mines'].values():
                 f.write(handler.tab)
                 f.write('(dlocation m' + str(mine['id']) + handler.space + 'n' + str(mine['node']) + ')' + handler.newline)
 
-            # set the initial site location for the buildings
-            # for site in world_info['sites'].values():
-            #     f.write(handler.tab)
-            #     f.write('(slocation s' + str(site['id']) + handler.space + 'n' + str(site['node']) + ')' + handler.newline)
-
-            # set the variables mining and not_mining for the mines
-            # for mine in world_info['mines'].values():
-            #     for node in world_info['nodes'].values():
-            #         if node['id'] == mine['node']:
-            #             f.write(handler.tab)
-            #             f.write('(not (mining m' + str(mine['id']) + handler.space + 'n' + str(node['id']) + '))' + handler.newline)
-            #             f.write(handler.tab)
-            #             f.write('(not_mining m' + str(mine['id']) + handler.space + 'n' + str(node['id']) + ')' + handler.newline)
+            # set the variables create_site, not_created_site, mining, not_mining, carrying, not_carrying
+            # deposited, not_deposited, constructed, not_constructed, rcolor
+            f.write(handler.newline)
+            for task in world_info['tasks'].values():
+                for i in range(sum(task['needed_resources'])):
+                    for actor in world_info['actors'].values():
+                        f.write(handler.tab)
+                        f.write('(not (create_site a' + str(actor['id']) + handler.space + 'n' + str(task['node']) + '))' + handler.newline)
+                        f.write(handler.tab)
+                        f.write('(not_created_site a' + str(actor['id']) + handler.space + 'n' + str(task['node']) + ')' + handler.newline)
+                        f.write(handler.tab)
+                        f.write('(not (mining a' + str(actor['id']) + handler.space + 'r' + str(i) + '))' + handler.newline)
+                        f.write(handler.tab)
+                        f.write('(not_mining a' + str(actor['id']) + handler.space + 'r' + str(i) + ')' + handler.newline)
+                        f.write(handler.tab)
+                        f.write('(not (carrying a' + str(actor['id']) + handler.space + 'r' + str(i) + '))' + handler.newline)
+                        f.write(handler.tab)
+                        f.write('(not_carrying a' + str(actor['id']) + handler.space + 'r' + str(i) + ')' + handler.newline)
+                        
+                        for j in range(len(PDDLInterface.COLOURS)):
+                            f.write(handler.tab)
+                            f.write('(not (deposited a' + str(actor['id']) + handler.space + 'r' + str(i) + handler.space + 'c' + str(j) + handler.space + 'n' + str(task['node']) + '))' + handler.newline)
+                            f.write(handler.tab)
+                            f.write('(not_deposited a' + str(actor['id']) + handler.space + 'r' + str(i) + handler.space + 'c' + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.newline)
+                            f.write(handler.tab)
+                            f.write('(not (constructed a' + str(actor['id']) + handler.space + 'r' + str(i) + handler.space + 'c' + str(j) + handler.space + 'n' + str(task['node']) + '))' + handler.newline)
+                            f.write(handler.tab)
+                            f.write('(not_constructed a' + str(actor['id']) + handler.space + 'r' + str(i) + handler.space + 'c' + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.newline)
+                            f.write(handler.tab)
+                            f.write('(rcolor r' + str(i) + handler.space + 'c' + str(j) + ')' + handler.newline)
+                            break
+                        break
+                    break 
+                break
 
             f.write(handler.close_paren)
             f.write(handler.newline)
@@ -132,12 +144,12 @@ class PDDLInterface:
             f.write(handler.tab + '(and' + handler.newline)
 
             # set the goal node for each actor different from the initial node
-            for actor in world_info['actors'].values():
-                for node in world_info['nodes'].values():
-                    if node['id'] != actor['node']:
-                        f.write(handler.tab + handler.tab)
-                        f.write('(alocation a' + str(actor['id']) + handler.space + 'n' + str(node['id']) + ')' + handler.newline)
-                        break
+            # for actor in world_info['actors'].values():
+            #     for node in world_info['nodes'].values():
+            #         if node['id'] != actor['node']:
+            #             f.write(handler.tab + handler.tab)
+            #             f.write('(alocation a' + str(actor['id']) + handler.space + 'n' + str(node['id']) + ')' + handler.newline)
+            #             break
 
             # set the goal node for digging for each actor with different resource
             # for actor in world_info['actors'].values():
@@ -146,6 +158,19 @@ class PDDLInterface:
             #             f.write(handler.tab + handler.tab)
             #             f.write('(rlocation r' + str(resource['id']) + handler.space + 'n' + str(actor['node']) + ')' + handler.newline)
             #             break
+
+            # fetch the tasks from the world info
+            for task in world_info['tasks'].values():
+                for i in range(len(task['needed_resources'])):
+                    for actor in world_info['actors'].values():
+                        for j in range(len(PDDLInterface.COLOURS)):
+                            # f.write(handler.tab + handler.tab)
+                            # f.write('(deposited a' + str(actor['id']) + handler.space + 'r' + str(i) + handler.space + 'c' + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.newline)
+                            f.write(handler.tab + handler.tab)
+                            f.write('(constructed a' + str(actor['id']) + handler.space + 'r' + str(i) + handler.space + 'c' + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.newline)
+                        break
+                    break
+                break
 
             f.write(")))" + handler.newline)
             f.close()
