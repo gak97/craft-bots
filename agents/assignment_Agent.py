@@ -104,6 +104,7 @@ class Assignment_Agent(Agent):
             else:
                 # Set our first action
                  action, params = self.plan[0]
+                 print(self.plan[0])
                  # check if any actors are ready
                  if self.world_info['actors'][params[0]]['state'] == 0:
                     # Pop first action off stack
@@ -131,17 +132,17 @@ class Assignment_Agent(Agent):
         if action == 'move':
             self.api.move_to(params[0], params[2])
 
+        elif action == 'create-site':
+            self.api.start_site(params[0], params[1])
+            
         elif action == 'dig':
             self.api.dig_at(params[0], params[1])
 
-        elif action == 'pickup':
+        elif action == 'pick-up':
             self.api.pick_up_resource(params[0], params[1])
 
-        elif action == 'drop':
-            self.api.drop_resource(params[0], params[1])
-
-        elif action == 'create-site':
-            self.api.start_site(params[0], params[1])
+        # elif action == 'drop':
+        #     self.api.drop_resource(params[0], params[1])
 
         elif action == 'deposit':
             self.api.deposit_resources(params[0], params[2], params[1])

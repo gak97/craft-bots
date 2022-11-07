@@ -17,22 +17,22 @@
     (alocation a1 n1)
     (dlocation m1 n2)
 
-    (not (create_site a1 n1))
-    (not_created_site a1 n3)
+    (not (create_site n1))
+    (not_created_site n3)
 
-    (not (mining a1 r1))
-    (not_mining a1 r1)
+    (not (mining r1))
+    (not_mining r1)
 
     (not (rcolor r1 c1))
 
-    (not (carrying a1 r1))
-    (not_carrying a1 r1)
+    (not (carrying a1 r1 c1))
+    (not_carrying a1 r1 c1)
 
     (not (deposited a1 r1 c1 n3))
     (not_deposited a1 r1 c1 n3)
     
-    (not (constructed a1 r1 c1 n3))
-    (not_constructed a1 r1 c1 n3)
+    (not (constructed r1 c1 n3))
+    (not_constructed r1 c1 n3)
 
     (connected n1 n2)
     (connected n2 n3)
@@ -44,12 +44,12 @@
 (:goal 
     (and
         ;; move the actor to the mine and dig the resource
-        (alocation a1 n2)
-        ; (mining a1 r1)
-        ; (carrying a1 r1)
-        (create_site a1 n3)
+        ; (alocation a1 n2)
+        ; (mining r1)
+        ; (carrying a1 r1 c1)
+        (create_site n3)
         ; (deposited a1 r1 c1 n3)
-        ; (constructed a1 r1 c1 n3)
+        (constructed r1 c1 n3)
     )
 )
 
