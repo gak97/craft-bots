@@ -133,22 +133,41 @@ class Assignment_Agent(Agent):
             self.api.move_to(params[0], params[2])
 
         elif action == 'create-site':
-            self.api.start_site(params[0], params[1])
-            
+            for task in self.world_info['tasks'].values():
+                if task['node'] == params[1]:
+                    self.api.start_site(params[0], task['id'])
+            # self.api.start_site(params[0], params[1])
+
         elif action == 'dig':
             self.api.dig_at(params[0], params[1])
 
         elif action == 'pick-up':
-            self.api.pick_up_resource(params[0], params[1])
+            for resource in self.world_info['resources'].values():
+                if resource['location'] == params[1] and resource['colour'] == params[2]:
+                    # print(params)
+                    # print(resource['id'])
+                    self.api.pick_up_resource(params[0], resource['id'])
+            # self.api.pick_up_resource(params[0], params[1])
 
         # elif action == 'drop':
         #     self.api.drop_resource(params[0], params[1])
 
         elif action == 'deposit':
-            self.api.deposit_resources(params[0], params[2], params[1])
+            for task in self.world_info['tasks'].values():
+                if task['node'] == params[1]:
+                    for resource in self.world_info['resources'].values():
+                        if resource['location'] == params[0] and resource['colour'] == params[2]:
+                            print(params)
+                            print(task['site'])
+                            print(resource['id'])
+                            self.api.deposit_resources(params[0], task['site'], resource['id'])
+            # self.api.deposit_resources(params[0], params[2], params[1])
 
         elif action == 'construct':
-            self.api.construct_at(params[0], params[1])
+            for task in self.world_info['tasks'].values():
+                if task['node'] == params[1]:
+                    self.api.construct_at(params[0], task['site'])
+            # self.api.construct_at(params[0], params[1])
 
         else:
             print('Invalid action')

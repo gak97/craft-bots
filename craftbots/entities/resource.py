@@ -28,8 +28,10 @@ class Resource:
                        "used": self.used, "colour": colour}
 
     def __repr__(self):
-        return "Resource(" + str(self.id) + ", " + self.world.get_colour_string(self.colour) + ", " + str(
+        return "Resource(" + str(self.id) + ", " + str(self.location) + ", " + str(self.colour) + ")" + str(
             self.location) + ")"
+        # return "Resource(" + str(self.id) + ", " + self.world.get_colour_string(self.colour) + ", " + str(
+        #     self.location) + ")"
 
     def __str__(self):
         return self.__repr__()

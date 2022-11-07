@@ -106,41 +106,36 @@ class PDDLInterface:
             for mine in world_info['mines'].values():
                 f.write(handler.tab)
                 f.write('(dlocation m' + str(mine['id']) + handler.space + 'n' + str(mine['node']) + ')' + handler.newline)
+                f.write(handler.tab)
+                f.write('(mine_color m' + str(mine['id']) + handler.space + PDDLInterface.COLOURS[mine['colour']] + ')' + handler.newline)
 
             # set the variables create_site, not_created_site, mining, not_mining, carrying, not_carrying
             # deposited, not_deposited, constructed, not_constructed, rcolor
             f.write(handler.newline)
             for task in world_info['tasks'].values():
-                for i in task['needed_resources']:
-                    for actor in world_info['actors'].values():
+                for actor in world_info['actors'].values():      
+                    for idx, j in enumerate(PDDLInterface.COLOURS):
                         f.write(handler.tab)
-                        f.write('(not (create_site' + handler.space + 'n' + str(task['node']) + '))' + handler.newline)
+                        f.write('(not (carrying a' + str(actor['id']) + handler.space + str(j) + '))' + handler.newline)
                         f.write(handler.tab)
-                        f.write('(not_created_site' + handler.space + 'n' + str(task['node']) + ')' + handler.newline)
+                        f.write('(not_carrying a' + str(actor['id']) + handler.space + str(j) + ')' + handler.newline)
                         f.write(handler.tab)
-                        f.write('(not (mining' + handler.space + 'r' + str(i) + '))' + handler.newline)
+                        f.write('(not (deposited a' + str(actor['id']) + handler.space + str(j) + handler.space + 'n' + str(task['node']) + '))' + handler.newline)
                         f.write(handler.tab)
-                        f.write('(not_mining' + handler.space + 'r' + str(i) + ')' + handler.newline)
-                                                                        
-                        for j in PDDLInterface.COLOURS:
-                            f.write(handler.tab)
-                            f.write('(not (carrying a' + str(actor['id']) + handler.space + 'r' + str(i) + handler.space + str(j) + '))' + handler.newline)
-                            f.write(handler.tab)
-                            f.write('(not_carrying a' + str(actor['id']) + handler.space + 'r' + str(i) + handler.space + str(j) + ')' + handler.newline)
-                            f.write(handler.tab)
-                            f.write('(not (deposited a' + str(actor['id']) + handler.space + 'r' + str(i) + handler.space + str(j) + handler.space + 'n' + str(task['node']) + '))' + handler.newline)
-                            f.write(handler.tab)
-                            f.write('(not_deposited a' + str(actor['id']) + handler.space + 'r' + str(i) + handler.space + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.newline)
-                            f.write(handler.tab)
-                            f.write('(not (constructed' + handler.space + 'r' + str(i) + handler.space + str(j) + handler.space + 'n' + str(task['node']) + '))' + handler.newline)
-                            f.write(handler.tab)
-                            f.write('(not_constructed' + handler.space + 'r' + str(i) + handler.space + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.newline)
-                            f.write(handler.tab)
-                            f.write('(rcolor r' + str(i) + handler.space + str(j) + ')' + handler.newline)
-                            break
-                        break
-                    break
-                break
+                        f.write('(not_deposited a' + str(actor['id']) + handler.space + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.newline)
+                        f.write(handler.tab)
+                        # (= (color_count c l) 0)
+            
+            for task in world_info['tasks'].values():
+                f.write(handler.tab)
+                f.write('(not (create_site' + handler.space + 'n' + str(task['node']) + '))' + handler.newline)
+                f.write(handler.tab)
+                f.write('(not_created_site' + handler.space + 'n' + str(task['node']) + ')' + handler.newline)
+                for idx, j in enumerate(PDDLInterface.COLOURS):
+                    num_needed = task['needed_resources'][idx]
+                    if num_needed > 0:
+                        f.write('(= (color_count' + handler.space + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.space + str(num_needed) + ')' + handler.newline)
+
 
             f.write(handler.close_paren)
             f.write(handler.newline)
@@ -169,13 +164,21 @@ class PDDLInterface:
 
             # fetch the tasks from the world info
             for task in world_info['tasks'].values():
-                for i in task['needed_resources']:
-                    for j in PDDLInterface.COLOURS:
+                for idx, j in enumerate(PDDLInterface.COLOURS):
+                    num_needed = task['needed_resources'][idx]
+                    if num_needed > 0:
                         f.write(handler.tab + handler.tab)
-                        f.write('(constructed' + handler.space + 'r' + str(i) + handler.space + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.newline)
+                        f.write('(= (color_count' + handler.space + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.space + str(0) + ')' + handler.newline)
                         break
-                    break
-                break
+                    
+                                        
+                # for i in range(num_resources):
+                #     for j in PDDLInterface.COLOURS:
+                #         f.write(handler.tab + handler.tab)
+                #         f.write('(constructed' + handler.space + 'r' + str(i) + handler.space + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.newline)
+                #         break
+                #     break
+                # break
 
             f.write(")))" + handler.newline)
             f.close()

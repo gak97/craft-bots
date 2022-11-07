@@ -241,6 +241,7 @@ class Actor:
         :param resource: The resource to drop off
         :return: True if successful and False otherwise
         """
+        print(resource)
         if self.resources.__contains__(resource) \
                 and (self.node.sites.__contains__(site) or self.node.buildings.__contains__(site)) \
                 and self.state == Actor.IDLE:
