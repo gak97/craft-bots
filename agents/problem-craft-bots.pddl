@@ -20,8 +20,8 @@
     (not (create_site n1))
     (not_created_site n3)
 
-    (not (mining r1))
-    (not_mining r1)
+    ; (not (mining r1))
+    ; (not_mining r1)
 
     (not (rcolor r1 c1))
 
