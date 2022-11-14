@@ -1,15 +1,4 @@
-;; write the domain file to match the PDDL Interface python file
-
-;; scenario includes 3 actors moving between 10 locations connected by edges
-;; aim of the scenario is for the actors to use the resources to construct as many buildings as possible
-
-;; resources can be gathered at mines by mining and carried by actors, using pick up, deposit, and drop
-;; resources come in five types: red, green, blue, black, and orange
-;; actors can start construction at any location. Actors should deposit resources into partially constructed buildings 
-;; and then spend time constructing, until the building is complete
-
-;; buildings require different resources, and completing a building will improve the score, with the aim being to
-;; complete as many buildings as possible
+;; domain file for assignment-1 part-1 
 
 (define (domain craft-bots)
 
@@ -24,28 +13,16 @@
         (connected ?l1 - location ?l2 - location)
         (rlocation ?l - location ?c - color)
         
-        (blocation ?b - building ?l - location)
-        (not_blocation ?b - building ?l - location)
-        
         (create_site ?l - location)
         (not_created_site ?l - location)
-        
-        (slocation ?s - site ?l - location)
         (dlocation ?m - mine ?l - location)
         
         (carrying ?a - actor ?c - color)
         (not_carrying ?a - actor ?c - color)
-        
-        ; (mining ?r - resource)
-        ; (not_mining ?r - resource)
         (mine_color ?m - mine ?c - color)
-        
-        (rcolor ?r - resource ?c - color)
+
         (deposited ?a - actor ?c - color ?l - location)
         (not_deposited ?a - actor ?c - color ?l - location)
-
-        (constructed ?c - color ?l - location)
-        (not_constructed ?c - color ?l - location)
     )
 
     (:functions
@@ -74,13 +51,6 @@
         :effect (and (carrying ?a ?c) (not (rlocation ?l ?c)) (not (not_carrying ?a ?c)))
     )
 
-    ;; agent removes one resource from its inventory and adds it to the ground at the current node
-    (:action drop
-        :parameters (?a - actor ?l - location ?c - color)
-        :precondition (and (alocation ?a ?l) (carrying ?a ?c))
-        :effect (and (rlocation ?l ?c) (not (carrying ?a ?c)) (not_carrying ?a ?c))
-    )
-
     ;; create a new site at the given node and add it to the list of sites
     (:action create-site
         :parameters (?a - actor ?l - location)
@@ -101,6 +71,6 @@
     (:action construct
         :parameters (?a - actor ?l - location ?c - color)
         :precondition (and (alocation ?a ?l) (deposited ?a ?c ?l) (> (color_count ?c ?l) 0))
-        :effect (and (not (deposited ?a ?c ?l)) (decrease (color_count ?c ?l) 1))
+        :effect (and (not (deposited ?a ?c ?l)) (decrease (color_count ?c ?l) 1) (not_deposited ?a ?c ?l))
     )
 )

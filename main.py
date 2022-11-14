@@ -2,13 +2,16 @@ import argparse
 from agents.rule_based_agent import RBAgent
 from craftbots.simulation import Simulation
 from gui.main_window import CraftBotsGUI
-from agents.assignment_Agent import Assignment_Agent
+# from agents.assignment_Agent import Assignment_Agent
+from agents.assignment_Agent_temporal import Assignment_Agent
 
 if __name__ == '__main__':
 
     # parse command line arguments
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('-f', help="configuration file", type=str, default='craftbots/config/2022part1_configuration.yaml')
+    arg_parser.add_argument('-f', help="configuration file", type=str, default='craftbots\config\part2_configurationV2.yaml')
+    # arg_parser.add_argument('-f', help="configuration file", type=str, default='craftbots/config/2022part1_configuration.yaml')
+    # arg_parser.add_argument('-f', help="configuration file", type=str, default='craftbots/config/2022part2_configuration.yaml')
     # arg_parser.add_argument('-f', help="configuration file", type=str, default='craftbots/config/simple_configuration.yaml')
     args = arg_parser.parse_args()
 

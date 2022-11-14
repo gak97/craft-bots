@@ -137,6 +137,7 @@ class Assignment_Agent(Agent):
             for task in self.world_info['tasks'].values():
                 if task['node'] == params[1]:
                     self.api.start_site(params[0], task['id'])
+                    break
 
         elif action == 'dig':
             self.api.dig_at(params[0], params[1])
@@ -144,32 +145,22 @@ class Assignment_Agent(Agent):
         # send 2 actors to dig orange
         elif action == 'dig-orange':
             self.api.dig_at(params[0], params[2])
-            for actor in self.world_info['actors'].values():
-                if actor['state'] == 0 and actor['id'] != params[0]: 
-                    self.api.dig_at(actor['id'], params[2])
+            self.api.dig_at(params[1], params[2])
 
         elif action == 'dig-blue':
             self.api.dig_at(params[0], params[1])
 
-        # red resource has to be collected within the time interval 0-1200
-        # elif action == 'collect-red':
-        #     for resource in self.world_info['resources'].values():
-        #         if resource['location'] == params[1] and resource['colour'] == params[2]:
-        #             self.api.pick_up_resource(params[0], resource['id'])
-
         # black resource cannot be collected with along with other resources
-        # elif action == 'collect-black':
-        #     for resource in self.world_info['resources'].values():
-        #         if resource['location'] == params[1] and resource['colour'] == params[2]:
-        #             self.api.pick_up_resource(params[0], resource['id'])
+        # red resource has to be collected within the time interval 0-1200
+        elif action == 'collect-red' or action == 'collect-black':
+            for resource in self.world_info['resources'].values():
+                if resource['location'] == params[1] and resource['colour'] == params[2]:
+                    self.api.pick_up_resource(params[0], resource['id'])
 
         elif action == 'pick-up':
             for resource in self.world_info['resources'].values():
                 if resource['location'] == params[1] and resource['colour'] == params[2]:
                     self.api.pick_up_resource(params[0], resource['id'])
-
-        # elif action == 'drop':
-            # self.api.drop_resource(params[0], params[1])
 
         elif action == 'deposit':
             for task in self.world_info['tasks'].values():

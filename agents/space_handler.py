@@ -1,4 +1,4 @@
-# define a python class for handling spaces in problem.pddl file
+# python class for handling spaces in problem file
 
 class SpaceHandler():
     def __init__(self):

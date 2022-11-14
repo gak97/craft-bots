@@ -1,7 +1,6 @@
 from cgitb import handler
 from collections.abc import Set
-# import site
-import random
+import site
 from typing import List, Tuple, Union
 import requests
 import sys
@@ -56,16 +55,6 @@ class PDDLInterface:
             f.write(handler.dash + handler.space + 'mine' + handler.newline)
 
             f.write(handler.tab)
-            # take the maximum number of resources from the tasks
-            max_resources = 0
-            for task in world_info['tasks'].values():
-                if sum(task['needed_resources']) > max_resources:
-                    max_resources = sum(task['needed_resources'])
-            for i in range(max_resources):
-                f.write('r' + str(i) + handler.space)
-            f.write(handler.dash + handler.space + 'resource' + handler.newline)
-
-            f.write(handler.tab)
             for i in PDDLInterface.COLOURS:
                 f.write(str(i) + handler.space)
             f.write(handler.dash + handler.space + 'color' + handler.newline)
@@ -104,8 +93,7 @@ class PDDLInterface:
                 f.write(handler.tab)
                 f.write('(mine_color m' + str(mine['id']) + handler.space + PDDLInterface.COLOURS[mine['colour']] + ')' + handler.newline)
 
-            # set the variables create_site, not_created_site, mining, not_mining, carrying, not_carrying
-            # deposited, not_deposited, constructed, not_constructed, rcolor
+            # set the variables create_site, not_created_site, carrying, not_carrying, deposited, not_deposited
             f.write(handler.newline)
             for task in world_info['tasks'].values():
                 for actor in world_info['actors'].values():      
@@ -115,7 +103,6 @@ class PDDLInterface:
                         f.write(handler.tab)
                         f.write('(not_carrying a' + str(actor['id']) + handler.space + str(j) + ')' + handler.newline)
                     f.write(handler.newline)
-                f.write(handler.newline)
                 break
 
             for task in world_info['tasks'].values():
@@ -128,7 +115,6 @@ class PDDLInterface:
                         # break
                     f.write(handler.newline)
                     # break
-                f.write(handler.newline)
                 break
                         
             for task in world_info['tasks'].values():
@@ -142,7 +128,6 @@ class PDDLInterface:
                 for idx, j in enumerate(PDDLInterface.COLOURS):
                     num_needed = task['needed_resources'][idx]
                     if num_needed > 0:
-                        # (= (color_count c l) 0)
                         f.write(handler.tab)
                         f.write('(= (color_count' + handler.space + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.space + str(num_needed) + ')' + handler.newline)
                         # break
@@ -160,14 +145,15 @@ class PDDLInterface:
 
             # fetch the tasks from the world info
             for task in world_info['tasks'].values():
-                for idx, j in enumerate(PDDLInterface.COLOURS):
-                    num_needed = task['needed_resources'][idx]
-                    if num_needed > 0:
-                        f.write(handler.tab + handler.tab)
-                        f.write('(= (color_count' + handler.space + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.space + str(0) + ')' + handler.newline)
+                if not world_info['tasks'][task['id']]['completed']:
+                    for idx, j in enumerate(PDDLInterface.COLOURS):
+                        num_needed = task['needed_resources'][idx]
+                        if num_needed > 0:
+                            f.write(handler.tab + handler.tab)
+                            f.write('(= (color_count' + handler.space + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.space + str(0) + ')' + handler.newline)
+                            # break
                         # break
-                    # break
-                break
+                    break
 
             f.write(")))" + handler.newline)
             f.close()
