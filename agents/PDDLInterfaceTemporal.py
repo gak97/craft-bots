@@ -96,43 +96,47 @@ class PDDLInterface:
             # set the variables create_site, not_created_site, carrying, not_carrying, deposited, not_deposited
             f.write(handler.newline)
             for task in world_info['tasks'].values():
-                for actor in world_info['actors'].values():      
-                    for idx, j in enumerate(PDDLInterface.COLOURS):
-                        f.write(handler.tab)
-                        f.write('(not (carrying a' + str(actor['id']) + handler.space + str(j) + '))' + handler.newline)
-                        f.write(handler.tab)
-                        f.write('(not_carrying a' + str(actor['id']) + handler.space + str(j) + ')' + handler.newline)
-                    f.write(handler.newline)
-                break
+                if not world_info['tasks'][task['id']]['completed']:
+                    for actor in world_info['actors'].values():      
+                        for idx, j in enumerate(PDDLInterface.COLOURS):
+                            f.write(handler.tab)
+                            f.write('(not (carrying a' + str(actor['id']) + handler.space + str(j) + '))' + handler.newline)
+                            f.write(handler.tab)
+                            f.write('(not_carrying a' + str(actor['id']) + handler.space + str(j) + ')' + handler.newline)
+                        f.write(handler.newline)
+                    break
 
             for task in world_info['tasks'].values():
-                for actor in world_info['actors'].values():
-                    for idx, j in enumerate(PDDLInterface.COLOURS):
-                        f.write(handler.tab)
-                        f.write('(not (deposited a' + str(actor['id']) + handler.space + str(j) + handler.space + 'n' + str(task['node']) + '))' + handler.newline)
-                        f.write(handler.tab)
-                        f.write('(not_deposited a' + str(actor['id']) + handler.space + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.newline)
+                if not world_info['tasks'][task['id']]['completed']:
+                    for actor in world_info['actors'].values():
+                        for idx, j in enumerate(PDDLInterface.COLOURS):
+                            f.write(handler.tab)
+                            f.write('(not (deposited a' + str(actor['id']) + handler.space + str(j) + handler.space + 'n' + str(task['node']) + '))' + handler.newline)
+                            f.write(handler.tab)
+                            f.write('(not_deposited a' + str(actor['id']) + handler.space + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.newline)
+                            # break
+                        f.write(handler.newline)
                         # break
-                    f.write(handler.newline)
-                    # break
-                break
+                    break
                         
             for task in world_info['tasks'].values():
-                f.write(handler.tab)
-                f.write('(not (create_site' + handler.space + 'n' + str(task['node']) + '))' + handler.newline)
-                f.write(handler.tab)
-                f.write('(not_created_site' + handler.space + 'n' + str(task['node']) + ')' + handler.newline)
-                break
+                if not world_info['tasks'][task['id']]['completed']:
+                    f.write(handler.tab)
+                    f.write('(not (create_site' + handler.space + 'n' + str(task['node']) + '))' + handler.newline)
+                    f.write(handler.tab)
+                    f.write('(not_created_site' + handler.space + 'n' + str(task['node']) + ')' + handler.newline)
+                    break
 
             for task in world_info['tasks'].values():
-                for idx, j in enumerate(PDDLInterface.COLOURS):
-                    num_needed = task['needed_resources'][idx]
-                    if num_needed > 0:
-                        f.write(handler.tab)
-                        f.write('(= (color_count' + handler.space + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.space + str(num_needed) + ')' + handler.newline)
+                if not world_info['tasks'][task['id']]['completed']:
+                    for idx, j in enumerate(PDDLInterface.COLOURS):
+                        num_needed = task['needed_resources'][idx]
+                        if num_needed > 0:
+                            f.write(handler.tab)
+                            f.write('(= (color_count' + handler.space + str(j) + handler.space + 'n' + str(task['node']) + ')' + handler.space + str(num_needed) + ')' + handler.newline)
+                            # break
                         # break
-                    # break
-                break
+                    break
 
             # edge length
             for edge in world_info['edges'].values():
